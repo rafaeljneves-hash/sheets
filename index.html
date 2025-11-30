@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salão Masculino Rafael</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    
+    <style>
+        /* Reset e estilos gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2c2c2c, #1a1a1a);
+            color: #f0f0f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Cabeçalho */
+        header {
+            background: linear-gradient(90deg, #333, #111);
+            padding: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo h1 {
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, #f0f0f0, #cccccc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Navegação */
+        nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav li {
+            margin: 0 15px;
+        }
+
+        nav a {
+            color: #f0f0f0;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        nav a:hover {
+            color: #cccccc;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Seções */
+        section {
+            padding: 60px 0;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #888, #333);
+        }
+
+        /* Galeria */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Serviços */
+        .services {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .service-card {
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #f0f0f0;
+        }
+
+        .service-card p {
+            color: #cccccc;
+            font-size: 1.1rem;
+        }
+
+        /* Pagamento */
+        .payment-methods {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .payment-type {
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            min-width: 280px;
+        }
+
+        .payment-type h3 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #f0f0f0;
+            text-align: center;
+        }
+
+        .payment-icons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .payment-icon {
+            background-color: #444;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        /* Localização */
+        .location {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .address {
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .address p {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .map {
+            width: 100%;
+            max-width: 600px;
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .map iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* WhatsApp */
+        .whatsapp {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .whatsapp-btn {
+            display: inline-block;
+            background: linear-gradient(90deg, #25D366, #128C7E);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .whatsapp-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Agendamento */
+        .booking {
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #555;
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #888, #555);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #999, #666);
+        }
+
+        /* Rodapé */
+        footer {
+            background: linear-gradient(90deg, #111, #000);
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-content p {
+            margin-bottom: 10px;
+        }
+
+        /* Área administrativa */
+        .admin-bar {
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            padding: 10px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+        }
+
+        .admin-bar a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 4px;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .admin-bar a:hover {
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .admin-login {
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .admin-login h2 {
+            margin-bottom: 30px;
+        }
+
+        .admin-panel {
+            display: none;
+            padding: 40px;
+            background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin: 40px auto;
+            max-width: 1000px;
+        }
+
+        .clients-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .clients-table th,
+        .clients-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #555;
+        }
+
+        .clients-table th {
+            background-color: #444;
+            font-weight: 600;
+        }
+
+        .clients-table tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .logout-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: linear-gradient(90deg, #ff7b7b, #ff6b35);
+        }
+
+        /* Notificação de Agendamento */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1002;
+            display: none;
+            animation: fadeInOut 5s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .notification-icon {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 20px;
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            z-index: 1003;
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Status do Firebase */
+        .firebase-status {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+
+        .firebase-connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .firebase-disconnected {
+            background-color: #f44336;
+            color: white;
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            nav li {
+                margin: 8px 0;
+            }
+            
+            .gallery, .services {
+                grid-template-columns: 1fr;
+            }
+            
+            .payment-methods {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .notification {
+                right: 10px;
+                left: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra administrativa -->
+    <div class="admin-bar">
+        <a href="#" id="admin-link">Área Administrativa</a>
+    </div>
+
+    <!-- Status do Firebase -->
+    <div id="firebase-status" class="firebase-status firebase-disconnected">Firebase: Desconectado</div>
+
+    <!-- Notificação de Agendamento -->
+    <div class="notification-icon" id="notification-icon"></div>
+    <div class="notification" id="notification">Cliente <span id="client-name"></span> fez agendamento!</div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>Conectando ao banco de dados...</p>
+    </div>
+
+    <!-- Cabeçalho -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <h1>Salão Masculino Rafael</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#servicos">Serviços</a></li>
+                    <li><a href="#galeria">Galeria</a></li>
+                    <li><a href="#pagamento">Pagamento</a></li>
+                    <li><a href="#localizacao">Localização</a></li>
+                    <li><a href="#agendamento">Agendar</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Galeria -->
+    <section id="galeria">
+        <div class="container">
+            <h2>Nossos Trabalhos</h2>
+            <div class="gallery">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Corte masculino moderno">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1622286342621-4bd786c2447c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Corte degradê">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Estilo masculino">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Serviços -->
+    <section id="servicos">
+        <div class="container">
+            <h2>Nossos Serviços</h2>
+            <div class="services">
+                <div class="service-card">
+                    <h3>Corte Masculino Simples</h3>
+                    <p>R$ 10 a R$ 15</p>
+                </div>
+                <div class="service-card">
+                    <h3>Barba Simples</h3>
+                    <p>R$ 5 a R$ 10</p>
+                </div>
+                <div class="service-card">
+                    <h3>Sobrancelha Masculina</h3>
+                    <p>R$ 5</p>
+                </div>
+                <div class="service-card">
+                    <h3>Degradê Iniciante (Fade Básico)</h3>
+                    <p>R$ 15 a R$ 20</p>
+                </div>
+                <div class="service-card">
+                    <h3>Pézinho + Acabamento</h3>
+                    <p>R$ 5</p>
+                </div>
+                <div class="service-card">
+                    <h3>Hidratação Capilar Masculina</h3>
+                    <p>R$ 10</p>
+                </div>
+                <div class="service-card">
+                    <h3>Camuflagem de Barba</h3>
+                    <p>R$ 10 a R$ 15</p>
+                </div>
+                <div class="service-card">
+                    <h3>Corte Infantil Simples</h3>
+                    <p>R$ 10</p>
+                </div>
+                <div class="service-card">
+                    <h3>Relaxamento Masculino</h3>
+                    <p>R$ 15 a R$ 20</p>
+                </div>
+                <div class="service-card">
+                    <h3>Corte Militar (Máquina 1, 2 ou 3)</h3>
+                    <p>R$ 8 a R$ 10</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagamento -->
+    <section id="pagamento">
+        <div class="container">
+            <h2>Formas de Pagamento</h2>
+            <div class="payment-methods">
+                <div class="payment-type">
+                    <h3>Cartão de Crédito</h3>
+                    <p>Aceitamos:</p>
+                    <div class="payment-icons">
+                        <div class="payment-icon">Visa</div>
+                        <div class="payment-icon">Mastercard</div>
+                        <div class="payment-icon">Elo</div>
+                        <div class="payment-icon">Hipercard</div>
+                        <div class="payment-icon">American Express</div>
+                        <div class="payment-icon">Cabal</div>
+                    </div>
+                </div>
+                <div class="payment-type">
+                    <h3>Cartão de Débito</h3>
+                    <p>Aceitamos:</p>
+                    <div class="payment-icons">
+                        <div class="payment-icon">Visa Electron</div>
+                        <div class="payment-icon">Maestro</div>
+                        <div class="payment-icon">Elo Débito</div>
+                        <div class="payment-icon">Hipercard Débito</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Localização -->
+    <section id="localizacao">
+        <div class="container">
+            <h2>Localização</h2>
+            <div class="location">
+                <div class="address">
+                    <p><strong>Endereço:</strong></p>
+                    <p>JD Ponte Alta, Viela 03, Travessa com Av. Florestan Fernandes 1239</p>
+                    <p>Guarulhos - SP</p>
+                </div>
+                <div class="map">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3658.122569434261!2d-46.53048542477202!3d-23.520178678824245!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce5f8c9c8e40d5%3A0x4e0d6e345a2a5a0f!2sAv.%20Florestan%20Fernandes%2C%201239%20-%20Jardim%20Ponte%20Alta%20I%2C%20Guarulhos%20-%20SP%2C%2007232-120!5e0!3m2!1spt-BR!2sbr!4v1698765432100!5m2!1spt-BR!2sbr" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp -->
+    <section id="whatsapp">
+        <div class="container">
+            <div class="whatsapp">
+                <h2>Agende pelo WhatsApp</h2>
+                <p>Clique no botão abaixo para enviar uma mensagem pré-formatada com nossos serviços</p>
+                <a href="https://wa.me/5511950644016?text=Olá! Gostaria de agendar um horário. Serviços disponíveis:%0A1. Corte Masculino Simples – R$ 10 a R$ 15%0A2. Barba Simples – R$ 5 a R$ 10%0A3. Sobrancelha Masculina – R$ 5%0A4. Degradê Iniciante – R$ 15 a R$ 20%0A5. Pézinho + Acabamento – R$ 5%0A6. Hidratação Capilar Masculina – R$ 10%0A7. Camuflagem de Barba – R$ 10 a R$ 15%0A8. Corte Infantil Simples – R$ 10%0A9. Relaxamento Masculino – R$ 15 a R$ 20%0A10. Corte Militar – R$ 8 a R$ 10" class="whatsapp-btn" target="_blank">
+                    Enviar Mensagem no WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agendamento -->
+    <section id="agendamento">
+        <div class="container">
+            <h2>Agende Seu Horário</h2>
+            <div class="booking">
+                <form id="booking-form">
+                    <div class="form-group">
+                        <label for="name">Nome Completo</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Telefone</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Serviço Desejado</label>
+                        <select id="service" name="service" required>
+                            <option value="">Selecione um serviço</option>
+                            <option value="Corte Masculino Simples">Corte Masculino Simples – R$ 10 a R$ 15</option>
+                            <option value="Barba Simples">Barba Simples – R$ 5 a R$ 10</option>
+                            <option value="Sobrancelha Masculina">Sobrancelha Masculina – R$ 5</option>
+                            <option value="Degradê Iniciante">Degradê Iniciante (Fade Básico) – R$ 15 a R$ 20</option>
+                            <option value="Pézinho + Acabamento">Pézinho + Acabamento – R$ 5</option>
+                            <option value="Hidratação Capilar Masculina">Hidratação Capilar Masculina – R$ 10</option>
+                            <option value="Camuflagem de Barba">Camuflagem de Barba – R$ 10 a R$ 15</option>
+                            <option value="Corte Infantil Simples">Corte Infantil Simples – R$ 10</option>
+                            <option value="Relaxamento Masculino">Relaxamento Masculino – R$ 15 a R$ 20</option>
+                            <option value="Corte Militar">Corte Militar (Máquina 1, 2 ou 3) – R$ 8 a R$ 10</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date">Data Preferencial</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Horário Preferencial</label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payment">Forma de Pagamento</label>
+                        <select id="payment" name="payment" required>
+                            <option value="">Selecione a forma de pagamento</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="PIX">PIX</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Mensagem Adicional (Opcional)</label>
+                        <textarea id="message" name="message" placeholder="Alguma observação ou preferência específica..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Finalizar Agendamento</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <p>Salão Masculino Rafael</p>
+                <p>JD Ponte Alta, Viela 03, Travessa com Av. Florestan Fernandes 1239 - Guarulhos</p>
+                <p>Telefone: (11) 95064-4016</p>
+                <p>Horário de Funcionamento: Segunda a Sábado, 8h às 20h</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Área Administrativa -->
+    <div id="admin-login" class="admin-login" style="display: none;">
+        <h2>Login Administrativo</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="username">Usuário</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Senha</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit" class="submit-btn">Entrar</button>
+        </form>
+    </div>
+
+    <div id="admin-panel" class="admin-panel" style="display: none;">
+        <h2>Painel Administrativo</h2>
+        <p>Aqui você pode visualizar todos os agendamentos feitos pelos clientes.</p>
+        
+        <table class="clients-table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Serviço</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Pagamento</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="clients-list">
+                <!-- Os dados dos clientes serão inseridos aqui via JavaScript -->
+            </tbody>
+        </table>
+        
+        <button id="logout-btn" class="logout-btn">Sair</button>
+    </div>
+
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjIrxtWmjSxJcfPLUV0asTWZwOx3uEW98",
+            authDomain: "salao-857ef.firebaseapp.com",
+            projectId: "salao-857ef",
+            storageBucket: "salao-857ef.firebasestorage.app",
+            messagingSenderId: "171169766618",
+            appId: "1:171169766618:web:5d52f74d5c779bcce859e3",
+            measurementId: "G-7EME82E6ZX"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Elementos da UI
+        const loadingElement = document.getElementById('loading');
+        const statusElement = document.getElementById('firebase-status');
+
+        // Atualizar status do Firebase
+        function updateFirebaseStatus(connected) {
+            if (connected) {
+                statusElement.textContent = "Firebase: Conectado";
+                statusElement.className = "firebase-status firebase-connected";
+                loadingElement.style.display = 'none';
+            } else {
+                statusElement.textContent = "Firebase: Desconectado";
+                statusElement.className = "firebase-status firebase-disconnected";
+                loadingElement.style.display = 'block';
+            }
+        }
+
+        // Monitorar conexão com o Firebase
+        firebase.firestore().enablePersistence()
+            .then(() => {
+                // Firebase está conectado e funcionando offline também
+                updateFirebaseStatus(true);
+            })
+            .catch((err) => {
+                console.error("Erro ao conectar com Firebase:", err);
+                updateFirebaseStatus(false);
+            });
+
+        // Referência para a coleção de agendamentos
+        const bookingsRef = db.collection("bookings");
+
+        // Mostrar notificação de agendamento
+        function showNotification(clientName) {
+            const notificationIcon = document.getElementById('notification-icon');
+            const notification = document.getElementById('notification');
+            const clientNameSpan = document.getElementById('client-name');
+            
+            clientNameSpan.textContent = clientName;
+            notificationIcon.style.display = 'block';
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+                notificationIcon.style.display = 'none';
+            }, 5000);
+        }
+
+        // Formulário de agendamento
+        document.getElementById('booking-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const service = document.getElementById('service').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            const payment = document.getElementById('payment').value;
+            const message = document.getElementById('message').value;
+            
+            try {
+                // Salvar no Firebase
+                await bookingsRef.add({
+                    name,
+                    phone,
+                    service,
+                    date,
+                    time,
+                    payment,
+                    message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pendente'
+                });
+                
+                // Limpar formulário
+                document.getElementById('booking-form').reset();
+                
+                // Mostrar notificação
+                showNotification(name);
+                
+                // Mostrar mensagem de sucesso
+                alert('Agendamento realizado com sucesso! Entraremos em contato para confirmar.');
+            } catch (error) {
+                console.error("Erro ao salvar agendamento:", error);
+                alert('Erro ao realizar agendamento. Tente novamente.');
+            }
+        });
+
+        // Área administrativa
+        document.getElementById('admin-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('admin-login').style.display = 'block';
+            document.querySelector('header').style.display = 'none';
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.querySelector('footer').style.display = 'none';
+        });
+
+        // Login administrativo
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'Rafael.Neves' && password === '99647820') {
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                
+                // Carregar lista de clientes do Firebase
+                loadBookings();
+                
+                // Escutar novos agendamentos em tempo real
+                listenToNewBookings();
+            } else {
+                alert('Usuário ou senha incorretos!');
+            }
+        });
+
+        // Função para carregar agendamentos
+        function loadBookings() {
+            const clientsList = document.getElementById('clients-list');
+            
+            bookingsRef.orderBy('timestamp', 'desc').get()
+                .then((querySnapshot) => {
+                    clientsList.innerHTML = '';
+                    querySnapshot.forEach((doc) => {
+                        const client = doc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${client.name}</td>
+                            <td>${client.phone}</td>
+                            <td>${client.service}</td>
+                            <td>${client.date}</td>
+                            <td>${client.time}</td>
+                            <td>${client.payment}</td>
+                            <td>
+                                <button onclick="confirmBooking('${doc.id}')" class="confirm-btn">Confirmar</button>
+                                <button onclick="cancelBooking('${doc.id}')" class="cancel-btn">Cancelar</button>
+                            </td>
+                        `;
+                        clientsList.appendChild(row);
+                    });
+                })
+                .catch((error) => {
+                    console.error("Erro ao carregar agendamentos:", error);
+                });
+        }
+
+        // Escutar novos agendamentos em tempo real
+        function listenToNewBookings() {
+            bookingsRef.orderBy('timestamp', 'desc')
+                .onSnapshot((querySnapshot) => {
+                    const clientsList = document.getElementById('clients-list');
+                    clientsList.innerHTML = '';
+                    
+                    querySnapshot.forEach((doc) => {
+                        const client = doc.data();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${client.name}</td>
+                            <td>${client.phone}</td>
+                            <td>${client.service}</td>
+                            <td>${client.date}</td>
+                            <td>${client.time}</td>
+                            <td>${client.payment}</td>
+                            <td>
+                                <button onclick="confirmBooking('${doc.id}')" class="confirm-btn">Confirmar</button>
+                                <button onclick="cancelBooking('${doc.id}')" class="cancel-btn">Cancelar</button>
+                            </td>
+                        `;
+                        clientsList.appendChild(row);
+                    });
+                    
+                    // Mostrar notificação se há novos agendamentos
+                    if (querySnapshot.docChanges().length > 0) {
+                        const changes = querySnapshot.docChanges();
+                        changes.forEach(change => {
+                            if (change.type === 'added') {
+                                showNotification(change.doc.data().name);
+                            }
+                        });
+                    }
+                });
+        }
+
+        // Funções globais para os botões de ação
+        window.confirmBooking = function(bookingId) {
+            if (confirm('Confirmar este agendamento?')) {
+                bookingsRef.doc(bookingId).update({
+                    status: 'confirmado'
+                })
+                .then(() => {
+                    alert('Agendamento confirmado!');
+                })
+                .catch((error) => {
+                    console.error("Erro ao confirmar agendamento:", error);
+                });
+            }
+        };
+
+        window.cancelBooking = function(bookingId) {
+            if (confirm('Cancelar este agendamento?')) {
+                bookingsRef.doc(bookingId).update({
+                    status: 'cancelado'
+                })
+                .then(() => {
+                    alert('Agendamento cancelado!');
+                })
+                .catch((error) => {
+                    console.error("Erro ao cancelar agendamento:", error);
+                });
+            }
+        };
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            document.getElementById('admin-panel').style.display = 'none';
+            document.querySelector('header').style.display = 'block';
+            document.querySelectorAll('section').forEach(section => {
+                section.style.display = 'block';
+            });
+            document.querySelector('footer').style.display = 'block';
+            
+            document.getElementById('login-form').reset();
+        });
+
+        // Inicializar data mínima no formulário de agendamento
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').min = today;
+    </script>
+</body>
+</html>
